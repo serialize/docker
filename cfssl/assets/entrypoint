@@ -1,0 +1,67 @@
+#!/bin/sh
+
+set -e
+
+export PKI_DEFAULT_COUNTRY="${PKI_DEFAULT_COUNTRY:-DE}"
+export PKI_DEFAULT_STATE="${PKI_DEFAULT_STATE:-BaWue}"
+export PKI_DEFAULT_LOCATION="${PKI_DEFAULT_LOCATION:-Stuttgart}"
+export PKI_DEFAULT_ORG="${PKI_DEFAULT_ORG:-Serialize}"
+export PKI_DEFAULT_ORG_UNIT="${PKI_DEFAULT_ORG_UNIT:-IT}"
+
+
+function create_csr()
+{
+    TMPL="$1"
+    CN="$2"
+
+    cat "/usr/local/share/cfssl/csr-${TMPL}.json" |
+    sed "s/%%%CN%%%/${CN}/g" |
+    sed "s/%%%COUNTRY%%%/${PKI_DEFAULT_COUNTRY}/g" |
+    sed "s/%%%STATE%%%/${PKI_DEFAULT_STATE}/g" |
+    sed "s/%%%LOCATION%%%/${PKI_DEFAULT_LOCATION}/g" |
+    sed "s/%%%ORG%%%/${PKI_DEFAULT_ORG}/g" |
+    sed "s/%%%ORGUNIT%%%/${PKI_DEFAULT_ORG_UNIT}/g" > "/etc/cfssl/csr-${TMPL}.json"
+}
+
+if [ ! -f /etc/cfssl/cfssl.conf ] ; then
+
+
+    if [ -z "$PKI_CA_AUTH_KEY" ]; then
+        export PKI_CA_AUTH_KEY="$(hexdump -n 16 -e "4/4 \"%08X\" 1 \"\n\"" /dev/random)"
+        echo "Auth-Key Generated: $PKI_CA_AUTH_KEY"
+    fi
+
+    cat "/usr/local/share/cfssl/cfssl.conf" |
+    sed "s/%%%AUTH_KEY%%%/${PKI_CA_AUTH_KEY}/g" > "/etc/cfssl/cfssl.conf"
+
+fi
+
+if [ ! -f /etc/cfssl/ca.pem ] || [ ! -f /etc/cfssl/ca-key.pem ] ; then
+
+    export PKI_CA_ROOT_CN="${PKI_CA_ROOT_CN:-Serialize Root CA}"
+    create_csr "ca-root" "${PKI_CA_ROOT_CN}"
+
+    cfssl gencert \
+        -initca "/etc/cfssl/csr-ca-root.json" | 
+        cfssljson -bare /etc/cfssl/ca-root
+
+    rm /etc/cfssl/ca-root.csr /etc/cfssl/csr-ca-root.json
+
+    export PKI_CA_INTERMEDIATE_CN="${PKI_CA_INTERMEDIATE_CN:-Serialize Intermediate CA}"
+    create_csr "ca-intermediate" "${PKI_CA_INTERMEDIATE_CN}"
+
+    cfssl gencert \
+        -ca "/etc/cfssl/ca-root.pem" \
+        -ca-key "/etc/cfssl/ca-root-key.pem" \
+        -config "/etc/cfssl/cfssl.conf" \
+        -profile "intermediate_ca" \
+        "/etc/cfssl/csr-ca-intermediate.json" | 
+        cfssljson -bare /etc/cfssl/ca-intermediate
+
+    rm /etc/cfssl/ca-intermediate.csr /etc/cfssl/csr-ca-intermediate.json
+    ln -s /etc/cfssl/ca-intermediate.pem /etc/cfssl/ca.pem
+    ln -s /etc/cfssl/ca-intermediate-key.pem /etc/cfssl/ca-key.pem
+
+fi
+
+exec "$@"
