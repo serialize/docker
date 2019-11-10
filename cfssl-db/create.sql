@@ -1,19 +1,20 @@
 CREATE TABLE certificates (
-  serial_number            varbinary(128) NOT NULL,
-  authority_key_identifier varbinary(128) NOT NULL,
-  ca_label                 varbinary(128),
-  status                   varbinary(128) NOT NULL,
+  serial_number            bytea NOT NULL,
+  authority_key_identifier bytea NOT NULL,
+  ca_label                 bytea,
+  status                   bytea NOT NULL,
   reason                   int,
-  expiry                   timestamp DEFAULT '0000-00-00 00:00:00',
-  revoked_at               timestamp DEFAULT '0000-00-00 00:00:00',
-  pem                      varbinary(4096) NOT NULL,
+  expiry                   timestamptz,
+  revoked_at               timestamptz,
+  pem                      bytea NOT NULL,
   PRIMARY KEY(serial_number, authority_key_identifier)
 );
 
 CREATE TABLE ocsp_responses (
-  serial_number            varbinary(128) NOT NULL,
-  authority_key_identifier varbinary(128) NOT NULL,
-  body                     varbinary(4096) NOT NULL,
-  expiry                   timestamp DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY(serial_number, authority_key_identifier)
+  serial_number            bytea NOT NULL,
+  authority_key_identifier bytea NOT NULL,
+  body                     bytea NOT NULL,
+  expiry                   timestamptz,
+  PRIMARY KEY(serial_number, authority_key_identifier),
+  FOREIGN KEY(serial_number, authority_key_identifier) REFERENCES certificates(serial_number, authority_key_identifier)
 );
