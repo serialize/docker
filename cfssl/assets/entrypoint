@@ -62,6 +62,37 @@ if [ ! -f /etc/cfssl/ca.pem ] || [ ! -f /etc/cfssl/ca-key.pem ] ; then
     ln -s /etc/cfssl/ca-intermediate.pem /etc/cfssl/ca.pem
     ln -s /etc/cfssl/ca-intermediate-key.pem /etc/cfssl/ca-key.pem
 
+    cat /etc/cfssl/ca-root.pem > /etc/cfssl/ca-bundle.crt
+
 fi
 
-exec "$@"
+if [ "$1" != "cfssl" ]; then
+
+	exec cfssl "$@"
+
+elif [[ "$1" == "cfssl" ]] && [[ "$2" == "serve" ]] && [[ $# -eq 2 ]]; then
+
+    SERVE_ARGS=()
+
+    [ -f /etc/cfssl/ca.pem ] && SERVE_ARGS+=("-ca=ca.pem")
+    [ -f /etc/cfssl/ca-key.pem ] && SERVE_ARGS+=("-ca-key=ca-key.pem")
+    [ -f /etc/cfssl/ca-bundle.crt ] && SERVE_ARGS+=("-ca-bundle=ca-bundle.crt")
+    [ -f /etc/cfssl/int-bundle.crt ] && SERVE_ARGS+=("-int-bundle=int-bundle.crt")
+    [ -f /etc/cfssl/db-config.json ] && SERVE_ARGS+=("-db-config=db-config.json")
+    [ -f /etc/cfssl/cfssl.conf ] && SERVE_ARGS+=("-config=cfssl.conf")
+
+    SERVE_ARGS+=("-address=0.0.0.0")
+    SERVE_ARGS+=("-port=8888")
+
+    exec cfssl serve "${SERVE_ARGS[@]}"
+
+else
+
+    exec "$@"
+
+fi
+
+
+
+
+

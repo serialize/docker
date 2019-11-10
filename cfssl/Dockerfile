@@ -45,13 +45,6 @@ WORKDIR /etc/cfssl
 VOLUME [ "/etc/cfssl" ]
 EXPOSE 8888
 
-ENTRYPOINT ["/entrypoint"]
+ENTRYPOINT [ "/entrypoint" ]
 
-CMD ["cfssl", \
-     "serve", \
-     "-address=0.0.0.0", \
-     "-ca=/etc/cfssl/ca.pem", \
-     "-ca-key=/etc/cfssl/ca-key.pem", \
-     "-ca-bundle=/etc/cfssl/ca-root.pem", \
-     "-config=/etc/cfssl/cfssl.conf", \
-     "-port=8888"]
+CMD [ "cfssl", "serve" ]
