@@ -47,4 +47,9 @@ EXPOSE 8888
 
 ENTRYPOINT [ "/entrypoint" ]
 
-CMD [ "cfssl", "serve" ]
+CMD [ "cfssl", "serve", \
+      "-address=0.0.0.0", "-port=8888", \
+      "-ca=/etc/cfssl/ca.pem", \
+      "-ca-key=/etc/cfssl/ca-key.pem", \
+      "-config=/etc/cfssl/cfssl.conf", \
+      "-db-config=/etc/cfssl/db-config.json" ]
