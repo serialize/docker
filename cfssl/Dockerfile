@@ -26,8 +26,8 @@ VOLUME /cfssl-bin
 FROM alpine:3.10
 
 COPY ./assets/entrypoint /
-COPY ./assets/*.json /usr/local/share/cfssl
-COPY ./assets/*.conf /usr/local/share/cfssl
+COPY ./assets/*.json /usr/local/share/cfssl/
+COPY ./assets/*.conf /usr/local/share/cfssl/
 COPY --from=build-env /cfssl-bin /usr/bin
 
 RUN addgroup -S cfssl \
