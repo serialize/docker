@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ ! -f "$LEMUR_PASSWORD_FILE" ]; then
+    password="lemur"
+else
+    password="$( cat $LEMUR_PASSWORD_FILE )"
+fi
+
+cd lemur/
+lemur init -p "$password"
+cd ..
+
+exec "$@"
