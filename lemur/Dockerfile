@@ -47,7 +47,7 @@ COPY ./lemur.conf.py $LEMUR_CONF
 RUN curl -sSL https://github.com/Netflix/lemur/archive/$VERSION.tar.gz | tar xz -C /opt/lemur --strip-components=1 && \
     pip3 install --upgrade pip && \
     pip3 install --upgrade setuptools && \
-    chmod +x /entrypoint && \
+    chmod +x /entrypoint.sh && \
     chown -R $user:$group /opt/lemur/ /etc/lemur/ /var/log/lemur/ /home/lemur/.lemur/
 
 WORKDIR /opt/lemur
@@ -63,6 +63,6 @@ VOLUME [ "/opt/lemur/lemur/static/dist", "/var/log/lemur", "/etc/lemur" ]
 
 USER lemur
 
-ENTRYPOINT [ "/entrypoint" ]
+ENTRYPOINT [ "/entrypoint.sh" ]
 
 CMD [ "lemur", "start", "-b", "0.0.0.0:8000" ]
