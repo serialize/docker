@@ -33,9 +33,11 @@ RUN addgroup -S cfssl \
     && adduser -S -g cfssl cfssl \
 	&& mkdir -p /etc/cfssl \
     && chown -R cfssl:cfssl /etc/cfssl /entrypoint.sh \
-                /usr/bin/{cfssl,cfssljson,mkbundle,multirootca} \
+                /usr/bin/cfssl /usr/bin/cfssljson \
+                /usr/bin/mkbundle /usr/bin/multirootca \
     && chmod -R 770 /etc/cfssl /entrypoint.sh \
-                /usr/bin/{cfssl,cfssljson,mkbundle,multirootca}
+                /usr/bin/cfssl /usr/bin/cfssljson \
+                /usr/bin/mkbundle /usr/bin/multirootca
 
 USER cfssl
 
@@ -44,6 +46,6 @@ WORKDIR /etc/cfssl
 VOLUME [ "/etc/cfssl" ]
 EXPOSE 8888
 
-ENTRYPOINT [ "/entrypoint" ]
+ENTRYPOINT [ "/entrypoint.sh" ]
 
 CMD [ "cfssl", "serve" ]
