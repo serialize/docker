@@ -29,7 +29,8 @@ COPY ./entrypoint.sh /
 COPY ./config.json /etc/cfssl/
 COPY --from=build-env /cfssl-bin /usr/bin
 
-RUN addgroup -S cfssl \
+RUN apk add --no-cache bash \
+    && addgroup -S cfssl \
     && adduser -S -g cfssl cfssl \
 	&& mkdir -p /etc/cfssl \
     && chown -R cfssl:cfssl /etc/cfssl /entrypoint.sh \
