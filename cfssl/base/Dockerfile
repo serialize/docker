@@ -25,7 +25,6 @@ VOLUME /cfssl-bin
 
 FROM alpine:3.10
 
-COPY ./entrypoint.sh /
 COPY ./config.json /etc/cfssl/
 COPY --from=build-env /cfssl-bin /usr/bin
 
@@ -33,10 +32,10 @@ RUN apk add --no-cache bash \
     && addgroup -S cfssl \
     && adduser -S -g cfssl cfssl \
 	&& mkdir -p /etc/cfssl \
-    && chown -R cfssl:cfssl /etc/cfssl /entrypoint.sh \
+    && chown -R cfssl:cfssl /etc/cfssl \
                 /usr/bin/cfssl /usr/bin/cfssljson \
                 /usr/bin/mkbundle /usr/bin/multirootca \
-    && chmod -R 770 /etc/cfssl /entrypoint.sh \
+    && chmod -R 770 /etc/cfssl \
                 /usr/bin/cfssl /usr/bin/cfssljson \
                 /usr/bin/mkbundle /usr/bin/multirootca
 
@@ -47,6 +46,6 @@ WORKDIR /etc/cfssl
 VOLUME [ "/etc/cfssl" ]
 EXPOSE 8888
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+ENTRYPOINT [ "cfssl" ]
 
-CMD [ "cfssl", "serve" ]
+CMD [ "--help" ]
