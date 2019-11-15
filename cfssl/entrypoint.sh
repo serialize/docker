@@ -43,6 +43,7 @@ function check_file_param
 }
 
 
+handle_db_config
 
 address="${CFSSL_ADDRESS:-0.0.0.0}"
 port="${CFSSL_PORT:-8888}"
