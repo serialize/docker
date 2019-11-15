@@ -4,6 +4,26 @@ set -e
 
 args=()
 
+if [ -z "${CFSSL_DB_PASSWORD}" ]; then
+
+    db_pw="${CFSSL_DB_PASSWORD}"
+    db_host="${CFSSL_DB_HOSTNAME:-db}"
+    db_port="${CFSSL_DB_PORT:-5432}"
+    db_user="${CFSSL_DB_HOSTNAME:-postgres}"
+    db_name="${CFSSL_DB_NAME:-postgres}"
+
+    db_uri="postgres://${db_user}:${db_pw}@${db_host}:${db_port}/${db_name}?sslmode=disable"
+
+    {
+        echo '{'
+        echo '  "driver": "postgres",'
+        echo '  "data_source": "$db_uri"'
+        echo '}'
+    }  > /etc/cfssl/db-config.json
+
+fi
+
+
 address="${CFSSL_ADDRESS:-0.0.0.0}"
 port="${CFSSL_PORT:-8888}"
 ca_cert="${CFSSL_CA_CERT:-/etc/cfssl/ca.pem}"
