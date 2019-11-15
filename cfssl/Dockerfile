@@ -49,4 +49,4 @@ EXPOSE 8888
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 
-CMD [ "cfssl", "serve" ]
+CMD [ "cfssl" ]
