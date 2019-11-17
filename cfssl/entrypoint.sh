@@ -30,7 +30,7 @@ function handle_db_config
 function check_value_param
 {
     if [[ ! -z "${2}" ]]; then
-        PARAMS+=("-${1}=${2}")
+        echo "-${1}=${2}"
     fi
 }
 
@@ -38,9 +38,25 @@ function check_value_param
 function check_file_param
 {
     if [[ ! -z "${2}" || -f "${2}" ]]; then
-        PARAMS+=("-${1}=${2}")
+        echo "-${1}=${2}"
     fi
 }
+
+#for f in /entrypoint-init.d/*
+#do
+#    if [ -x "$f" ]; then
+#        echo "$0: running $f"
+#
+#        set -e
+ #       EXIT_CODE=0
+ #       "$f" || EXIT_CODE=$?
+ #   else
+ #       echo "$0: sourcing $f"
+  #      . "$f"
+  #  fi
+
+#
+#done
 
 
 handle_db_config
@@ -51,24 +67,33 @@ port="${CFSSL_PORT:-8888}"
 check_value_param "address" "${CFSSL_ADDRESS}"
 check_value_param "port" "${CFSSL_PORT}"
 
+CFSSL_CA_CERT="${CFSSL_CA_CERT:-/etc/cfssl/ca.pem}"
+CFSSL_CA_KEY="${CFSSL_CA_KEY:-/etc/cfssl/ca-key.pem}"
+CFSSL_CA_BUNDLE="${CFSSL_CA_BUNDLE:-/etc/cfssl/ca-bundle.crt}"
+CFSSL_INT_BUNDLE="${CFSSL_INT_BUNDLE:-/etc/cfssl/int-bundle.crt}"
 
-ca_cert="${CFSSL_CA_CERT:-/etc/cfssl/ca.pem}"
-ca_key="${CFSSL_CA_KEY:-/etc/cfssl/ca-key.pem}"
-ca_bundle="${CFSSL_CA_BUNDLE:-/etc/cfssl/ca-bundle.crt}"
-int_bundle="${CFSSL_INT_BUNDLE:-/etc/cfssl/int-bundle.crt}"
+CFSSL_CONFIG="${CFSSL_CONFIG:-/etc/cfssl/config.json}"
 
-config="${CFSSL_CONFIG:-/etc/cfssl/config.json}"
-db_config="${CFSSL_DB_CONFIG:-/etc/cfssl/db-config.json}"
+result=$(check_file_param ca $CFSSL_CA_CERT)
+echo $result
+PARAMS+=( $result )
 
-check_file_param "ca" "${CFSSL_CA_CERT}"
-check_file_param "ca-key" "${CFSSL_CA_KEY}"
-check_file_param "ca-bundle" "${CFSSL_CA_BUNDLE}"
-check_file_param "int-bundle" "${CFSSL_INT_BUNDLE}"
+result=$(check_file_param ca-key $CFSSL_CA_KEY)
+echo $result
+PARAMS+=( $result )
 
-check_file_param "config" "${CFSSL_CONFIG}"
-check_file_param "db-config" "${CFSSL_DB_CONFIG}"
+result=$(check_file_param ca-bundle $CFSSL_CA_BUNDLE)
+echo $result
+PARAMS+=( $result )
 
+result=$(check_file_param int-bundle $CFSSL_INT_BUNDLE)
+echo $result
+PARAMS+=( $result )
 
+result=$(check_file_param config $CFSSL_CONFIG)
+echo $result
+PARAMS+=( $result )
 
 exec "$@" "${PARAMS[@]}"
 
+exit 0
