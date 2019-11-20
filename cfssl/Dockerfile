@@ -28,7 +28,7 @@ FROM alpine:3.10
 
 COPY --from=build-env /cfssl-bin /usr/bin
 
-RUN apk add --no-cache bash \
+RUN apk add --no-cache bash curl \
     && addgroup -S cfssl \
     && adduser -S -g cfssl cfssl \
 	&& mkdir -p /etc/cfssl \
