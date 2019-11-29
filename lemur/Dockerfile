@@ -52,8 +52,7 @@ RUN curl -sSL https://github.com/Netflix/lemur/archive/$VERSION.tar.gz | tar xz 
 
 WORKDIR /opt/lemur
 
-RUN sed -i 's/localhost/pki_manager_api/g' /opt/lemur/gulp/server.js && \
-    npm install --unsafe-perm && \
+RUN npm install --unsafe-perm && \
     pip3 install -e . && \
     node_modules/.bin/gulp build && \
     node_modules/.bin/gulp package --urlContextPath=$(urlContextPath) && \
