@@ -64,4 +64,4 @@ USER lemur
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 
-CMD [ "lemur", "start", "-b", "0.0.0.0:8000" ]
+CMD [ "./manage.py", "start", "-b", "0.0.0.0:8000" ]

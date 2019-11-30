@@ -8,7 +8,6 @@ sed -i "s/localhost/${LEMUR_API_HOSTNAME}/g" /opt/lemur/gulp/server.js && \
 LEMUR_PASSWORD="${LEMUR_PASSWORD:-lemur}"
 
 cd lemur
-/usr/bin/python3 manage.py init -p "$LEMUR_PASSWORD"
-cd ..
+./manage.py init -p "$LEMUR_PASSWORD"
 
 exec "$@"
