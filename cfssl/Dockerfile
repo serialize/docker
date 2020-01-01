@@ -28,6 +28,8 @@ FROM alpine:3.10
 
 COPY --from=build-env /cfssl-bin /usr/bin
 
+COPY cfssl-serve.sh /usr/bin/cfssl-serve
+
 RUN apk add --no-cache bash curl sqlite \
     && addgroup -S cfssl \
     && adduser -S -g cfssl cfssl \
