@@ -28,17 +28,20 @@ FROM alpine:3.10
 
 COPY --from=build-env /cfssl-bin /usr/bin
 
-RUN apk add --no-cache bash curl \
+RUN apk add --no-cache bash curl sqlite \
     && addgroup -S cfssl \
     && adduser -S -g cfssl cfssl \
-	&& mkdir -p /etc/cfssl \
+	&& mkdir -p /etc/cfssl /etc/certs \
     && chown -R cfssl:cfssl \
                 /etc/cfssl \
+                /etc/certs \
                 /usr/bin/cfssl \
                 /usr/bin/cfssljson \
                 /usr/bin/mkbundle \
                 /usr/bin/multirootca \
-    && chmod -R 770 /etc/cfssl \
+    && chmod -R 770 \
+                /etc/cfssl \
+                /etc/certs \
                 /usr/bin/cfssl \
                 /usr/bin/cfssljson \
                 /usr/bin/mkbundle \
@@ -48,8 +51,7 @@ USER cfssl
 
 WORKDIR /etc/cfssl
 
-VOLUME [ "/etc/cfssl" ]
-EXPOSE 8888
+VOLUME [ "/etc/cfssl", "/etc/certs" ]
 
 ENTRYPOINT [ "cfssl" ]
 
